@@ -1,0 +1,62 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+\usepackage{xcolor-solarized}
+\usepackage{newtxtext,newtxmath}
+\tikzset{
+  /pgf/number format/.cd,
+  1000 sep={},
+}
+\pgfplotsset{compat=1.17}
+\begin{document}
+\begin{tikzpicture}[thick]
+\begin{axis}[
+  width=85mm,
+  height=65mm,
+  xlabel={Wavelength (nm)},
+  ylabel={Drop Port Power (dB)},
+  xlabel near ticks,
+  ylabel near ticks,
+  legend entries={{legends}},
+  legend pos=south east,
+  legend style={fill=none},
+  cycle list={
+    solarized-blue,
+    solarized-orange,
+    solarized-violet,
+    solarized-red,
+    solarized-green
+  },
+  {%- if is_focus -%}
+  ytick={
+    -12,
+    -10,
+    -8,
+    -6,
+    -4,
+    -2,
+    0
+  },
+  ymin=-12,
+  ymax=0,
+  xmin=1549,
+  xmax=1551,
+  {%- else -%}
+  ytick={
+    -60,
+    -50,
+    -40,
+    -30,
+    -20,
+    -10,
+    0
+  },
+  ymin=-60,
+  ymax=0,
+  {%- endif -%}
+]
+  {% for tsvname in tsvnames %}
+  \addplot+[no markers,{% if is_focus %},very thick{% endif %}] table[x expr={\thisrowno{0} * 1e9}] {{tsvname}};
+  {% endfor %}
+\end{axis}
+\end{tikzpicture}
+\end{document}

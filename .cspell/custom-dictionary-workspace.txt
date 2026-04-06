@@ -1,0 +1,23 @@
+# Custom Dictionary Words
+arange
+asdict
+astype
+dtype
+hstack
+kmeans
+lualatex
+mymath
+pgfplots
+pyplot
+scipy
+semilogx
+sklearn
+tolist
+tsvfile
+twinx
+xaxis
+xlabel
+xlim
+yaxis
+ylabel
+ylim
