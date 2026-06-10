@@ -280,7 +280,7 @@ def optimize_K_with_perturbation(
 
 
 
-
+"""
 def optimize_K(             #通常のSHADE用
     eta: float,
     number_of_rings: int,
@@ -304,11 +304,11 @@ def optimize_K(             #通常のSHADE用
     K: npt.NDArray[np.float_] = result[0]
 
     return K, E
-
-
-
-
 """
+
+
+
+
 def optimize_K(             #通常のSHADE用,誤差を考慮
     eta: float,
     number_of_rings: int,
@@ -332,7 +332,7 @@ def optimize_K(             #通常のSHADE用,誤差を考慮
     K: npt.NDArray[np.float_] = result[0]
 
     return K, E
-"""
+
 
 
 """
