@@ -247,7 +247,7 @@ def optimize_K(
 
 
     #誤差を含めて結合率を最適化する用
-def optimize_K_with_perturbation(
+def optimize_K(
     eta: float,
     number_of_rings: int,
     rng: np.random.Generator,
