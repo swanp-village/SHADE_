@@ -24,7 +24,7 @@ patterns = [
     "BBAAAA"
 ]
 """
-patterns = ["AAABBB"]
+patterns = ["AABBBB"]
 # 各パターンごとの試行回数 (本番は5回)
 RUNS_PER_PATTERN = 5
 
