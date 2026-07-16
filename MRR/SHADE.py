@@ -16,6 +16,7 @@ def SHADE(func, bounds, params, pop_size, max_iter, H,  tol, callback=None, rng=
 
     lhs_samples = lhs(xdim, samples=pop_size, criterion="maximin")  # LHSで初期配置
     populations = np.amin(dimbounds) + lhs_samples * (np.amax(dimbounds) - np.amin(dimbounds))
+    print(f"[DIVERSITY] gen={i}, best_obj={best_obj:.4f}, std={np.std(obj_list):.6f}, mean={np.mean(obj_list):.6f}, pop_std_per_dim={np.std(populations, axis=0)}")
 
     populations_G = populations     #各世代Gの解を記録。世代毎のGを記録しておき、各解候補の更新は別のものに記録する。
     obj_list = [func(pop, params) for pop in populations]       #生成した初期解を関数に代入し評価値を返したリストを作成
@@ -71,10 +72,10 @@ def SHADE(func, bounds, params, pop_size, max_iter, H,  tol, callback=None, rng=
             k = k + 1
             if k > (H-1):
                 k = 0
-        print("記録メモリ F = ",MF_para_H)
-        print("記録メモリ CR = ",MCR_para_H)
-        print("scipy Fi = ",all_Fi)
-        print("scipy CRi = ",all_CRi)
+        #print("記録メモリ F = ",MF_para_H)
+        #print("記録メモリ CR = ",MCR_para_H)
+        #print("scipy Fi = ",all_Fi)
+        #print("scipy CRi = ",all_CRi)
 
 
 
@@ -83,13 +84,13 @@ def SHADE(func, bounds, params, pop_size, max_iter, H,  tol, callback=None, rng=
         obj_list_G = obj_list
         best_obj = min(obj_list)        #解候補を更新し、そのたびに最高の評価値がある場合は更新
         best_x = populations[np.argmin(obj_list)]       #最高の評価値が更新された場合用に記述、その解を記録
-        print("現在の評価値 = ",obj_list_G)
+        #print("現在の評価値 = ",obj_list_G)
 
 
         if best_obj < prev_obj:     #一周ごとに更新後の最高評価と更新前の最高評価を比べる
-            print("std(標準偏差？) = ", np.std(obj_list))
-            print("mean(平均) = ", np.mean(obj_list))
-            print("評価値確認",obj_list)
+            #print("std(標準偏差？) = ", np.std(obj_list))
+            #print("mean(平均) = ", np.mean(obj_list))
+            #print("評価値確認",obj_list)
             if np.std(obj_list) <= tol * np.abs(np.mean(obj_list)):     #用検討。収束方法を検討
                 break       #収束した
             prev_obj = best_obj     #この記述は収束していない場合に行われる。今までの最高評価を更新する。
