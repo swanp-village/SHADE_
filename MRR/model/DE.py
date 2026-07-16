@@ -22,6 +22,7 @@ from MRR.simulator import (
     optimize_N,
 )
 from MRR.transfer_function import simulate_transfer_function
+_debug_check_done = False 
 
 
 def optimize_L(
@@ -699,6 +700,21 @@ def optimize(
 
 
 def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.float_:
+    global _debug_check_done
+    if not _debug_check_done:
+        _debug_check_done = True
+        from MRR.transfer_function import _M
+        import numpy as np
+        result = _M(params.L, K, params.alpha, 
+                    __import__('MRR.simulator', fromlist=['calculate_x']).calculate_x(
+                        center_wavelength=params.center_wavelength, FSR=params.FSR),
+                    params.eta, params.n_eff, params.n_g, params.center_wavelength)
+        print("=== [DEBUG] _M diagnostic ===")
+        print("dtype:", result.dtype)
+        print("shape:", result.shape)
+        print("type of result[0,0]:", type(result[0, 0]))
+        print("shape of result[0,0]:", np.shape(result[0, 0]))
+        print("numpy version:", np.__version__)
     x = calculate_x(center_wavelength=params.center_wavelength, FSR=params.FSR)
     y = simulate_transfer_function(
         wavelength=x,
