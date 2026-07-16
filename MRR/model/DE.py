@@ -700,6 +700,7 @@ def optimize(
 
 
 def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.float_:
+    print("optimize_K_func CALLED")
     global _debug_check_done
     if not _debug_check_done:
         _debug_check_done = True
