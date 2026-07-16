@@ -698,24 +698,9 @@ def optimize(
         graph.show(logger.generate_image_path())
        
 
-
+"""
 def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.float_:
-    print("optimize_K_func CALLED")
-    global _debug_check_done
-    if not _debug_check_done:
-        _debug_check_done = True
-        from MRR.transfer_function import _M
-        import numpy as np
-        result = _M(params.L, K, params.alpha, 
-                    __import__('MRR.simulator', fromlist=['calculate_x']).calculate_x(
-                        center_wavelength=params.center_wavelength, FSR=params.FSR),
-                    params.eta, params.n_eff, params.n_g, params.center_wavelength)
-        print("=== [DEBUG] _M diagnostic ===")
-        print("dtype:", result.dtype)
-        print("shape:", result.shape)
-        print("type of result[0,0]:", type(result[0, 0]))
-        print("shape of result[0,0]:", np.shape(result[0, 0]))
-        print("numpy version:", np.__version__)
+   
     x = calculate_x(center_wavelength=params.center_wavelength, FSR=params.FSR)
     y = simulate_transfer_function(
         wavelength=x,
@@ -741,8 +726,57 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
         weight=params.weight,
         ignore_binary_evaluation=False,
     )
+"""
+_debug_check_done = False  # ファイル冒頭に追加(まだなければ)
 
+def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.float_:
+    global _debug_check_done
 
+    x = calculate_x(center_wavelength=params.center_wavelength, FSR=params.FSR)
+    y = simulate_transfer_function(
+        wavelength=x,
+        L=params.L,
+        K=K,
+        alpha=params.alpha,
+        eta=params.eta,
+        n_eff=params.n_eff,
+        n_g=params.n_g,
+        center_wavelength=params.center_wavelength,
+    )
+
+    if not _debug_check_done:
+        _debug_check_done = True
+        from MRR.transfer_function import _M
+        result = _M(params.L, K, params.alpha, x, params.eta, params.n_eff, params.n_g, params.center_wavelength)
+
+        print("=== [DEBUG] simulate_transfer_function diagnostic ===")
+        print("numpy version:", np.__version__)
+        print("y.shape:", y.shape)
+        print("NaN count:", np.isnan(y).sum())
+        print("Inf count:", np.isinf(y).sum())
+        print("y min/max:", np.nanmin(y), np.nanmax(y))
+        print("y sample:", y[:10])
+        print("=======================================")
+        print("=== [DEBUG] _M diagnostic ===")
+        print("dtype:", result.dtype)
+        print("shape:", result.shape)
+        print("type of result[0,0]:", type(result[0, 0]))
+        print("shape of result[0,0]:", np.shape(result[0, 0]))
+        print("=======================================")
+
+    return -evaluate_band(
+        x=x,
+        y=y,
+        center_wavelength=params.center_wavelength,
+        length_of_3db_band=params.length_of_3db_band,
+        max_crosstalk=params.max_crosstalk,
+        H_p=params.H_p,
+        H_s=params.H_s,
+        H_i=params.H_i,
+        r_max=params.r_max,
+        weight=params.weight,
+        ignore_binary_evaluation=False,
+    )
 
 
 """
