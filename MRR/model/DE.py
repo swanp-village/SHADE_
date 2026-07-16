@@ -295,7 +295,7 @@ def optimize_K(             #通常のSHADE用
                    params, 
                    pop_size=15, 
                    max_iter = 300,
-                   H = 50,
+                   H = 100,
                    tol = 0.01, 
                    callback = None, 
                    rng = None
