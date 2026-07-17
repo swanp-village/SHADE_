@@ -232,9 +232,10 @@ def optimize_K(
         #strategy="currenttobest1bin",
         strategy="rand1bin",
         #strategy="randtobest1bin",
-        workers=-1,
-        updating="immediate",
-        popsize=35,
+        workers=1,
+        #updating="immediate",
+        updating="deferred"
+        popsize=17,
         maxiter=500,
         seed=rng,
     )
