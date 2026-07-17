@@ -234,7 +234,7 @@ def optimize_K(
         #strategy="randtobest1bin",
         workers=1,
         #updating="immediate",
-        updating="deferred"
+        updating="deferred",
         popsize=17,
         maxiter=500,
         seed=rng,
