@@ -22,6 +22,7 @@ from MRR.simulator import (
     optimize_N,
 )
 from MRR.transfer_function import simulate_transfer_function
+import time
 _debug_check_done = False 
 
 
@@ -455,6 +456,7 @@ def optimize(
     method_list: list[int] = [0 for _ in range(number_of_generations)]
     best_E_list: list[float] = [0 for _ in range(number_of_generations)]
     analyze_score_list: list[float] = [0 for _ in range(number_of_generations)]
+    start_time = time.time()
     for m in range(number_of_generations):
         N: npt.NDArray[np.int_]
         L: npt.NDArray[np.float_]
@@ -691,6 +693,8 @@ def optimize(
         analyze_score_list=analyze_score_list,
     )
     print("end")
+    elapsed_time = time.time() - start_time
+    print(f"全体の処理時間: {elapsed_time:.2f}秒 ({elapsed_time/60:.2f}分)")
     if E > 0 and not skip_plot:
         graph = Graph()
         graph.create()
