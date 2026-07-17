@@ -214,7 +214,7 @@ def optimize_K(
 """
 
 
-"""
+
 def optimize_K(
     eta: float,
     number_of_rings: int,
@@ -241,7 +241,7 @@ def optimize_K(
     K: npt.NDArray[np.float_] = result.x
 
     return K, E
-"""
+
 
 
 
@@ -281,7 +281,7 @@ def optimize_K(
 
 
 
-
+"""
 def optimize_K(             #通常のSHADE用
     eta: float,
     number_of_rings: int,
@@ -305,7 +305,7 @@ def optimize_K(             #通常のSHADE用
     K: npt.NDArray[np.float_] = result[0]
 
     return K, E
-
+"""
 
 
 
