@@ -250,10 +250,10 @@ def SHADE(func, bounds, params, pop_size, max_iter, H,  tol, callback=None, rng=
         print(f"[TRACE-07] gen={i} loop start")
 
         r = [random.randint(0,H-1) for i in range(pop_size)]       #ランダムにメモリHの中から一つ番号を選ぶ。それがその世代が参照する制御パラメータになる。
-        #P_i = pop_size * random.uniform((2/pop_size), 0.2)     #カレントトゥピーベストのためのP、これで上位いくつまでかを小数で表す。おそらく2~3になる。
-        #P_i_int = math.floor(P_i)       #上記のPを整数に変換。小数を切り捨てることにより上位何位までを指定できるように。
-        P_i = pop_size * random.uniform(0.3, 0.5)  # 上位30〜50%まで選択肢を広げる
-        P_i_int = max(math.floor(P_i), 2)  # 最低でも2は確保
+        P_i = pop_size * random.uniform((2/pop_size), 0.2)     #カレントトゥピーベストのためのP、これで上位いくつまでかを小数で表す。おそらく2~3になる。
+        P_i_int = math.floor(P_i)       #上記のPを整数に変換。小数を切り捨てることにより上位何位までを指定できるように。
+        #P_i = pop_size * random.uniform(0.3, 0.5)  # 上位30〜50%まで選択肢を広げる
+        #P_i_int = max(math.floor(P_i), 2)  # 最低でも2は確保
         S_F = np.array([])
         S_CR = np.array([])
         delta_fk = np.array([])
@@ -352,7 +352,7 @@ def SHADE(func, bounds, params, pop_size, max_iter, H,  tol, callback=None, rng=
 
 def mut_cross(MF_para_H, MCR_para_H, bounds, j, pop_size, obj_list_G, populations_G, P_i_int, Archive, dims, seed):
     rng = np.random.default_rng(seed)
-    select_populations = Archive + populations_G
+    select_populations = Archive + list(populations_G)
     """
     if j == 0 and random.random() < 0.01:  # サンプリングして時々だけ出す(全世代出すと多すぎるため)
         print(f"[TRACE-MC-01] type(select_populations)={type(select_populations)}")
