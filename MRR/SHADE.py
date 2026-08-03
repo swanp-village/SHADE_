@@ -203,7 +203,8 @@ import time
 from multiprocessing import Pool	#宮崎で追加
 from scipy import stats
 from pyDOE2 import lhs
-
+import multiprocessing
+print("start method:", multiprocessing.get_start_method())
 def SHADE(func, bounds, params, pop_size, max_iter, H,  tol, callback=None, rng=None):
     print("[TRACE-01] SHADE start")
     if rng is None:
