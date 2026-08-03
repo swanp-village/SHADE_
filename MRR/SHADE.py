@@ -328,7 +328,7 @@ def SHADE(func, bounds, params, pop_size, max_iter, H,  tol, callback=None, rng=
             if np.std(obj_list) <= tol * np.abs(np.mean(obj_list)):     #用検討。収束方法を検討
                 print(f"[TRACE-14] gen={i} CONVERGENCE BREAK TRIGGERED")
                 convergence_break_hit = True
-                break       #収束した
+                #break       #収束した
             prev_obj = best_obj     #この記述は収束していない場合に行われる。今までの最高評価を更新する。
         else:
             print(f"[TRACE-13-SKIP] gen={i} NO IMPROVEMENT")
