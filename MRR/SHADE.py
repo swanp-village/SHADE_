@@ -369,7 +369,9 @@ def mut_cross(MF_para_H, MCR_para_H, bounds, j, pop_size, obj_list_G, population
     #Fi = 0.5
     A = np.array(obj_list_G)
     A_sort_index = np.argsort(A)        #ここ二行でobj_list_Gのソートを行っている。評価の良い順に並べ、そのインデックスがリストになっている。
-    xpbest_group = [populations_G[A_sort_index[i]] for i in range(P_i_int)]      #G世代の解候補の中から、評価が高いものをP_i_intの数だけ選んだ集合を作る。
+    xpbest_group = [populations_G[A_sort_index[i]] for i in range(P_i_int)]  
+    if j == 0:
+    print(f"[TRACE-MC-03] P_i_int={P_i_int}, xpbest_group_size={len(xpbest_group)}")#G世代の解候補の中から、評価が高いものをP_i_intの数だけ選んだ集合を作る。
     xpbest = random.choice(xpbest_group)        #G世代の解候補の中から上位N×P番目までの候補から一つを選んだ。
     indexes = [i for i in range(pop_size) if i != j]        #jは現在選んでいる解。それ以外の番号を指定しているインデックスを作成
     a = populations_G[rng.choice(indexes, 1, replace = False)]        #現在選んでいる解以外から1つを選ぶ。
