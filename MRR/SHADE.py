@@ -353,12 +353,20 @@ def SHADE(func, bounds, params, pop_size, max_iter, H,  tol, callback=None, rng=
 def mut_cross(MF_para_H, MCR_para_H, bounds, j, pop_size, obj_list_G, populations_G, P_i_int, Archive, dims, seed):
     rng = np.random.default_rng(seed)
     select_populations = Archive + populations_G
+    """
     if j == 0 and random.random() < 0.01:  # サンプリングして時々だけ出す(全世代出すと多すぎるため)
         print(f"[TRACE-MC-01] type(select_populations)={type(select_populations)}")
         if isinstance(select_populations, list):
             print(f"[TRACE-MC-01] len={len(select_populations)}, elem0_shape={np.shape(select_populations[0])}")
         else:
             print(f"[TRACE-MC-01] shape={select_populations.shape}")
+    """
+    if j == 0:  # 確実に最初の呼び出しで出す(サンプリングなし)
+        print(f"[CHECK] type={type(select_populations)}")
+        print(f"[CHECK] shape/len={getattr(select_populations, 'shape', len(select_populations))}")
+        print(f"[CHECK] first element:\n{select_populations[0]}")
+        print(f"[CHECK] Archive[0]:\n{Archive[0]}")
+        print(f"[CHECK] populations_G[0]:\n{populations_G[0]}")
     Fi = -1.0
     fi_retry = 0
     while Fi <= 0.0:
