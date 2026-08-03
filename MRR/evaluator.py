@@ -83,6 +83,7 @@ def evaluate_band(
         end = pass_band[0][1]
 
     else:
+        print(f"[EARLY-RETURN] pass_band.shape[0]={pass_band.shape[0]}")
         return np.float_(0)
 
     result = [
