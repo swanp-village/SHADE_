@@ -291,6 +291,13 @@ def optimize_K(             #通常のSHADE用
     params: OptimizeKParams,
 ) -> tuple[npt.NDArray[np.float_], float]:
     bounds = np.array([(1e-12, eta) for _ in range(number_of_rings + 1)])
+    print("glibc via numpy:", np.show_config())
+
+# 具体的な数値計算の一致を確認
+    x = np.array([0.35, 0.02, 0.04, 0.14, 0.06, 0.16, 0.14])
+    print("exp:", np.exp(1j * np.pi * x))
+    print("sqrt:", np.sqrt(x))
+    print("sum:", np.sum(x * 1.0000001))
 
     result = SHADE(optimize_K_func, 
                    bounds, 
