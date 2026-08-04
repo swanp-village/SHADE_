@@ -164,9 +164,11 @@ def selection(func, params, j, obj_list, populations, trial, Fi, CRi, S_F, S_CR,
     obj_trial = func(trial, params)   #交叉によって生成された解候補(pop_size分だけある)の評価値を計算する
     #print("[eval]j=",j)
     #print("trial=",np.round(trial,4))
+    """
     t0 = time.perf_counter()
     obj_trial = func(trial, params)
     t1 = time.perf_counter()
+    """
     #print(f"  [eval] j={j}, time={t1-t0:.4f}s, obj={obj_trial:.6f}")
     if obj_trial < obj_list[j]:     #交叉によって生成された解候補が現在のものより優れていた場合、更新する。
         
