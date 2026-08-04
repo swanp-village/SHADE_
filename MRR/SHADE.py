@@ -20,7 +20,9 @@ def SHADE(func, bounds, params, pop_size, max_iter, H,  tol, callback=None, rng=
     
 
     populations_G = populations     #各世代Gの解を記録。世代毎のGを記録しておき、各解候補の更新は別のものに記録する。
-    obj_list = [func(pop, params) for pop in populations]       #生成した初期解を関数に代入し評価値を返したリストを作成
+    obj_list = [func(pop, params) for pop in populations]  
+    print(f"[GEN0-CHECK] obj_list={obj_list}")
+    #生成した初期解を関数に代入し評価値を返したリストを作成
     obj_list_G = obj_list       #各世代Gの評価値を記録。扱いはpopulations_Gと同様
     best_x = populations[np.argmin(obj_list)]       #最もよい評価を得た際の解を記録,np.argminは最小の番号を返す
     best_obj = min(obj_list)        #最もよい評価を得た際の評価を記録する
