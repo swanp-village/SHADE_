@@ -14,7 +14,7 @@ def SHADE(func, bounds, params, pop_size, max_iter, H,  tol, callback=None, rng=
     xdim = len(bounds)      #最適化する変数の個数(結合率の数を入力することになる)
     dimbounds = np.ravel(bounds)
     populations = rng.uniform(low=np.amin(dimbounds), high=np.amax(dimbounds), size=(pop_size, xdim))       #解候補の初期配置、boundsの最小値~最大値の中からランダムで数値を決定し、初期解の個数(pop_size)分だけ生成
-
+    print(f"[POP-CHECK] populations=\n{populations}")
     lhs_samples = lhs(xdim, samples=pop_size, criterion="maximin")  # LHSで初期配置
     #populations = np.amin(dimbounds) + lhs_samples * (np.amax(dimbounds) - np.amin(dimbounds))
     
