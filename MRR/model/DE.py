@@ -703,7 +703,7 @@ def optimize(
         graph.show(logger.generate_image_path())
        
 
-"""
+
 def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.float_:
    
     x = calculate_x(center_wavelength=params.center_wavelength, FSR=params.FSR)
@@ -731,46 +731,8 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
         weight=params.weight,
         ignore_binary_evaluation=False,
     )
-"""
-"""
-_debug_check_done = False  # ファイル冒頭に追加(まだなければ)
-
-def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.float_:
-    global _debug_check_done
-
-    x = calculate_x(center_wavelength=params.center_wavelength, FSR=params.FSR)
-    y = simulate_transfer_function(
-        wavelength=x,
-        L=params.L,
-        K=K,
-        alpha=params.alpha,
-        eta=params.eta,
-        n_eff=params.n_eff,
-        n_g=params.n_g,
-        center_wavelength=params.center_wavelength,
-    )
 
 
-    return -evaluate_band(
-        x=x,
-        y=y,
-        center_wavelength=params.center_wavelength,
-        length_of_3db_band=params.length_of_3db_band,
-        max_crosstalk=params.max_crosstalk,
-        H_p=params.H_p,
-        H_s=params.H_s,
-        H_i=params.H_i,
-        r_max=params.r_max,
-        weight=params.weight,
-        ignore_binary_evaluation=False,
-    )
-     if not _debug_stage_done:
-        _debug_stage_done = True
-        print(f"[STAGE1] x[:5]={x[:5]}, x[-5:]={x[-5:]}, x.shape={x.shape}")
-        print(f"[STAGE2] y[:5]={y[:5]}, y.min()={y.min()}, y.max()={y.max()}")
-        print(f"[STAGE3] E={-result}")   # evaluate_bandの生の返り値(符号反転前)
-
-    return result
 """
 _debug_check_done = False  # ファイル冒頭に追加(まだなければ)
 
@@ -849,48 +811,9 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
         print(f"[M-CHECK] result_M[:3,0,0]={result_M[:3,0,0]}")
 
     return -E_raw 
-
-
 """
-_debug_check_done = False  # ファイル冒頭に追加(まだなければ)
 
-def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.float_:
-    global _debug_check_done
 
-    x = calculate_x(center_wavelength=params.center_wavelength, FSR=params.FSR)
-    y = simulate_transfer_function(
-        wavelength=x,
-        L=params.L,
-        K=K,
-        alpha=params.alpha,
-        eta=params.eta,
-        n_eff=params.n_eff,
-        n_g=params.n_g,
-        center_wavelength=params.center_wavelength,
-    )
-
-    E_raw = evaluate_band(
-        x=x,
-        y=y,
-        center_wavelength=params.center_wavelength,
-        length_of_3db_band=params.length_of_3db_band,
-        max_crosstalk=params.max_crosstalk,
-        H_p=params.H_p,
-        H_s=params.H_s,
-        H_i=params.H_i,
-        r_max=params.r_max,
-        weight=params.weight,
-        ignore_binary_evaluation=False,
-    )
-
-    if not _debug_check_done:
-        _debug_check_done = True
-        print(f"[STAGE1] x[:5]={x[:5]}, x[-5:]={x[-5:]}, x.shape={x.shape}")
-        print(f"[STAGE2] y[:5]={y[:5]}, y.min()={y.min()}, y.max()={y.max()}")
-        print(f"[STAGE3] E={E_raw}")
-
-    return -E_raw
-"""
 """
 #誤差を割合で掛け算するやつ
 def optimize_perturbed_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.float_:
