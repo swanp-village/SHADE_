@@ -739,7 +739,7 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
     K_test = np.array([0.2727833810587206, 0.16139735892957827, 
                        0.6078681832876891, 0.8808436209256807,
                        0.8622266045032947, 0.8243662424093396,
-                       0.5812543438252905)]
+                       0.5812543438252905])
     result_test = optimize_K_func(K_test, params)
     print("test:",result_test)
     x = calculate_x(center_wavelength=params.center_wavelength, FSR=params.FSR)
