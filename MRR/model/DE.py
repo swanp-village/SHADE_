@@ -771,7 +771,73 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
 
     return result
 """
+_debug_check_done = False  # ファイル冒頭に追加(まだなければ)
 
+def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.float_:
+    global _debug_check_done
+
+    x = calculate_x(center_wavelength=params.center_wavelength, FSR=params.FSR)
+    y = simulate_transfer_function(
+        wavelength=x,
+        L=params.L,
+        K=K,
+        alpha=params.alpha,
+        eta=params.eta,
+        n_eff=params.n_eff,
+        n_g=params.n_g,
+        center_wavelength=params.center_wavelength,
+    )
+
+    E_raw = evaluate_band(
+        x=x,
+        y=y,
+        center_wavelength=params.center_wavelength,
+        length_of_3db_band=params.length_of_3db_band,
+        max_crosstalk=params.max_crosstalk,
+        H_p=params.H_p,
+        H_s=params.H_s,
+        H_i=params.H_i,
+        r_max=params.r_max,
+        weight=params.weight,
+        ignore_binary_evaluation=False,
+    )
+
+    if not _debug_check_done:
+        _debug_check_done = True
+
+        # ここから固定Kでの比較テスト
+        K_fixed = np.array([0.44709679, 0.28804361, 0.91879344, 0.73478102, 0.71398602, 0.04463706, 0.75898206])
+        x_f = calculate_x(center_wavelength=params.center_wavelength, FSR=params.FSR)
+        y_f = simulate_transfer_function(
+            wavelength=x_f,
+            L=params.L,
+            K=K_fixed,
+            alpha=params.alpha,
+            eta=params.eta,
+            n_eff=params.n_eff,
+            n_g=params.n_g,
+            center_wavelength=params.center_wavelength,
+        )
+        E_f = evaluate_band(
+            x=x_f,
+            y=y_f,
+            center_wavelength=params.center_wavelength,
+            length_of_3db_band=params.length_of_3db_band,
+            max_crosstalk=params.max_crosstalk,
+            H_p=params.H_p,
+            H_s=params.H_s,
+            H_i=params.H_i,
+            r_max=params.r_max,
+            weight=params.weight,
+            ignore_binary_evaluation=False,
+        )
+        print(f"[FIXED-K TEST] params.L={params.L}")
+        print(f"[FIXED-K TEST] x_f.shape={x_f.shape}, x_f[:3]={x_f[:3]}")
+        print(f"[FIXED-K TEST] y_f[:3]={y_f[:3]}, y_f.min()={y_f.min()}, y_f.max()={y_f.max()}")
+        print(f"[FIXED-K TEST] E_f={E_f}")
+
+    return -E_raw
+"""
 _debug_check_done = False  # ファイル冒頭に追加(まだなければ)
 
 def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.float_:
@@ -810,7 +876,7 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
         print(f"[STAGE3] E={E_raw}")
 
     return -E_raw
-
+"""
 """
 #誤差を割合で掛け算するやつ
 def optimize_perturbed_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.float_:
