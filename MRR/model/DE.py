@@ -291,13 +291,6 @@ def optimize_K(             #通常のSHADE用
     params: OptimizeKParams,
 ) -> tuple[npt.NDArray[np.float_], float]:
     bounds = np.array([(1e-12, eta) for _ in range(number_of_rings + 1)])
-    K_test = np.array([0.2727833810587206, 0.16139735892957827, 
-                       0.6078681832876891, 0.8808436209256807,
-                       0.8622266045032947, 0.8243662424093396,
-                       0.5812543438252905])
-    result_test = optimize_K_func(K_test, params)
-    print("test:",result_test)
-
     result = SHADE(optimize_K_func, 
                    bounds, 
                    params, 
@@ -754,7 +747,7 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
         n_g=params.n_g,
         center_wavelength=params.center_wavelength,
     )
-
+"""
     if not _debug_check_done:
         _debug_check_done = True
         from MRR.transfer_function import _M
@@ -774,7 +767,7 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
         print("type of result[0,0]:", type(result[0, 0]))
         print("shape of result[0,0]:", np.shape(result[0, 0]))
         print("=======================================")
-
+"""
     return -evaluate_band(
         x=x,
         y=y,
@@ -788,6 +781,15 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
         weight=params.weight,
         ignore_binary_evaluation=False,
     )
+     if not _debug_stage_done:
+        _debug_stage_done = True
+        print(f"[STAGE1] x[:5]={x[:5]}, x[-5:]={x[-5:]}, x.shape={x.shape}")
+        print(f"[STAGE2] y[:5]={y[:5]}, y.min()={y.min()}, y.max()={y.max()}")
+        print(f"[STAGE3] E={-result}")   # evaluate_bandの生の返り値(符号反転前)
+
+    return result
+    
+
 
 
 """
