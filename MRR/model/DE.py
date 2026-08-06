@@ -832,6 +832,8 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
             weight=params.weight,
             ignore_binary_evaluation=False,
         )
+        print(f"[FIXED-FULL-TEST] y_f[:5]={y_f[:5]}, y_f.min()={y_f.min()}, y_f.max()={y_f.max()}")
+        print(f"[FIXED-FULL-TEST] E_f={E_f}")
         a_1 = np.exp(-params.alpha * params.L[0])
         result_R = _R(a_1, params.L[0], x_f, params.n_eff, params.n_g, params.center_wavelength)
         print(f"[R-CHECK] result_R[0,0][:3]={result_R[0,0][:3]}")
