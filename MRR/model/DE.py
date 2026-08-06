@@ -776,7 +776,6 @@ _debug_check_done = False  # ファイル冒頭に追加(まだなければ)
 
 def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.float_:
     global _debug_check_done
-
     x = calculate_x(center_wavelength=params.center_wavelength, FSR=params.FSR)
     y = simulate_transfer_function(
         wavelength=x,
@@ -788,7 +787,6 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
         n_g=params.n_g,
         center_wavelength=params.center_wavelength,
     )
-
     E_raw = evaluate_band(
         x=x,
         y=y,
@@ -806,12 +804,14 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
     if not _debug_check_done:
         _debug_check_done = True
 
-        # ここから固定Kでの比較テスト
+        # ★ L も完全に固定する(前回一致していたのと同じ値)
         K_fixed = np.array([0.44709679, 0.28804361, 0.91879344, 0.73478102, 0.71398602, 0.04463706, 0.75898206])
+        L_fixed = np.array([6.20e-05, 6.20e-05, 6.20e-05, 7.75e-05, 7.75e-05, 7.75e-05])
+
         x_f = calculate_x(center_wavelength=params.center_wavelength, FSR=params.FSR)
         y_f = simulate_transfer_function(
             wavelength=x_f,
-            L=params.L,
+            L=L_fixed,
             K=K_fixed,
             alpha=params.alpha,
             eta=params.eta,
@@ -834,22 +834,23 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
         )
         print(f"[FIXED-FULL-TEST] y_f[:5]={y_f[:5]}, y_f.min()={y_f.min()}, y_f.max()={y_f.max()}")
         print(f"[FIXED-FULL-TEST] E_f={E_f}")
-        a_1 = np.exp(-params.alpha * params.L[0])
-        result_R = _R(a_1, params.L[0], x_f, params.n_eff, params.n_g, params.center_wavelength)
-        print(f"[R-CHECK] result_R[0,0][:3]={result_R[0,0][:3]}")
-        print(f"[R-CHECK] result_R.dtype={result_R.dtype}")
-        print(f"[R-CHECK] result_R[0,0].dtype={result_R[0,0].dtype}")
 
-# _C単体のテスト
+        # ★ 新しい実装(shape=(W,2,2))に合わせた出力の取り方
+        a_1 = np.exp(-params.alpha * L_fixed[::-1][0])
+        result_R = _R(a_1, L_fixed[::-1][0], x_f, params.n_eff, params.n_g, params.center_wavelength)
+        print(f"[R-CHECK] result_R.shape={result_R.shape}")
+        print(f"[R-CHECK] result_R[:3,0,0]={result_R[:3,0,0]}")
+
         result_C = _C(K_fixed[0], params.eta)
         print(f"[C-CHECK] result_C={result_C}")
 
-# _M全体のテスト
-        result_M = _M(params.L, K_fixed, params.alpha, x_f, params.eta, params.n_eff, params.n_g, params.center_wavelength)
-        print(f"[M-CHECK] result_M[0,0][:3]={result_M[0,0][:3]}")
-        print(f"[M-CHECK] result_M.dtype={result_M.dtype}")
+        result_M = _M(L_fixed, K_fixed, params.alpha, x_f, params.eta, params.n_eff, params.n_g, params.center_wavelength)
+        print(f"[M-CHECK] result_M.shape={result_M.shape}")
+        print(f"[M-CHECK] result_M[:3,0,0]={result_M[:3,0,0]}")
 
-    return -E_raw
+    return -E_raw 
+
+
 """
 _debug_check_done = False  # ファイル冒頭に追加(まだなければ)
 
