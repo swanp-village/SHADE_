@@ -23,6 +23,7 @@ from MRR.simulator import (
 )
 from MRR.transfer_function import simulate_transfer_function
 import time
+from MRR.transfer_function import _M, _C, _R
 _debug_check_done = False 
 
 
@@ -831,10 +832,20 @@ def optimize_K_func(K: npt.NDArray[np.float_], params: OptimizeKParams) -> np.fl
             weight=params.weight,
             ignore_binary_evaluation=False,
         )
-        print(f"[FIXED-K TEST] params.L={params.L}")
-        print(f"[FIXED-K TEST] x_f.shape={x_f.shape}, x_f[:3]={x_f[:3]}")
-        print(f"[FIXED-K TEST] y_f[:3]={y_f[:3]}, y_f.min()={y_f.min()}, y_f.max()={y_f.max()}")
-        print(f"[FIXED-K TEST] E_f={E_f}")
+        a_1 = np.exp(-params.alpha * params.L[0])
+        result_R = _R(a_1, params.L[0], x_f, params.n_eff, params.n_g, params.center_wavelength)
+        print(f"[R-CHECK] result_R[0,0][:3]={result_R[0,0][:3]}")
+        print(f"[R-CHECK] result_R.dtype={result_R.dtype}")
+        print(f"[R-CHECK] result_R[0,0].dtype={result_R[0,0].dtype}")
+
+# _C単体のテスト
+        result_C = _C(K_fixed[0], params.eta)
+        print(f"[C-CHECK] result_C={result_C}")
+
+# _M全体のテスト
+        result_M = _M(params.L, K_fixed, params.alpha, x_f, params.eta, params.n_eff, params.n_g, params.center_wavelength)
+        print(f"[M-CHECK] result_M[0,0][:3]={result_M[0,0][:3]}")
+        print(f"[M-CHECK] result_M.dtype={result_M.dtype}")
 
     return -E_raw
 """
