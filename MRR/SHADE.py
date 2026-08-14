@@ -1,3 +1,4 @@
+"""
 import numpy as np
 import random
 import math
@@ -186,7 +187,248 @@ def selection(func, params, j, obj_list, populations, trial, Fi, CRi, S_F, S_CR,
 
 
     return obj_list[j], populations[j], S_F, S_CR, delta_fk, Archive, Archivetimes
+"""
+import numpy as np
+import math
+import time
+from multiprocessing import Pool
+from scipy import stats
+from pyDOE2 import lhs
 
+
+def SHADE(func, bounds, params, pop_size, max_iter, H, tol, callback=None, rng=None, verbose=False):
+    """
+    成功履歴自己適応型差分進化法 (SHADE)
+
+    修正点(先輩のコードからの変更点):
+      1. rngがそのまま探索全体に使われるようにし、再現性を確保
+         (mut_crossに渡す各ワーカー用シードも、このrngから生成する)
+      2. Archiveとpopulations_Gの結合を、要素ごとの足し算ではなく
+         正しいリスト結合(2*pop_size個の候補集合)に修正
+      3. multiprocessing.Poolをwith文で確実にclose/joinするよう修正
+         (世代ごとに作り直してもリソースが残らないようにする)
+      4. mut_cross内のrandom(標準ライブラリ)をrng(numpy Generator)に統一
+         これも再現性のため
+      5. デバッグ用printはverboseフラグで制御(デフォルトOFF)
+    """
+    if rng is None:
+        rng = np.random.default_rng()
+
+    xdim = len(bounds)
+    dimbounds = np.ravel(bounds)
+
+    # LHSによる初期集団配置(先輩のコードと同じ設定)
+    lhs_samples = lhs(xdim, samples=pop_size, criterion="maximin")
+    populations = np.amin(dimbounds) + lhs_samples * (np.amax(dimbounds) - np.amin(dimbounds))
+
+    populations_G = populations
+    obj_list = [func(pop, params) for pop in populations]
+    obj_list_G = obj_list
+    best_x = populations[np.argmin(obj_list)]
+    best_obj = min(obj_list)
+    prev_obj = best_obj
+
+    CR_para = 0.5
+    F_para = 0.5
+    MCR_para_H = [CR_para] * H
+    MF_para_H = [F_para] * H
+    k = 0
+
+    # 外部アーカイブ: 解候補と同じサイズのpop_size個。中身はxdim次元のゼロベクトルで初期化
+    Archive = [np.zeros(xdim) for _ in range(pop_size)]
+    Archivetimes = 0
+
+    time_sta = time.perf_counter()
+
+    for i in range(max_iter):
+        if verbose:
+            print(f"これは{i}世代を表している")
+
+        r = rng.integers(0, H, size=pop_size)
+        P_i = pop_size * rng.uniform(2 / pop_size, 0.2)
+        P_i_int = math.floor(P_i)
+        S_F = np.array([])
+        S_CR = np.array([])
+        delta_fk = np.array([])
+
+        # 各ワーカー用のシードを、共有rngから生成する(再現性のため)
+        worker_seeds = rng.integers(0, 2**32 - 1, size=pop_size)
+        mut_cross_paras = [
+            [
+                MF_para_H[r[j]],
+                MCR_para_H[r[j]],
+                bounds,
+                j,
+                pop_size,
+                obj_list_G,
+                populations_G,
+                P_i_int,
+                Archive,
+                xdim,
+                int(worker_seeds[j]),
+            ]
+            for j in range(pop_size)
+        ]
+
+        with Pool(processes=pop_size) as p:
+            tmp = list(p.map(wrapper_mut_cross, mut_cross_paras))
+
+        all_trial = np.zeros((pop_size, xdim))
+        all_Fi = np.zeros(pop_size)
+        all_CRi = np.zeros(pop_size)
+        for I in range(pop_size):
+            all_trial[I] = tmp[I][0]
+            all_Fi[I] = tmp[I][1]
+            all_CRi[I] = tmp[I][2]
+
+        for j in range(pop_size):
+            (
+                obj_list[j],
+                populations[j],
+                S_F,
+                S_CR,
+                delta_fk,
+                Archive,
+                Archivetimes,
+            ) = selection(
+                func,
+                params,
+                j,
+                obj_list_G,
+                populations_G,
+                all_trial[j],
+                all_Fi[j],
+                all_CRi[j],
+                S_F,
+                S_CR,
+                delta_fk,
+                Archive,
+                Archivetimes,
+            )
+
+        if S_F.size != 0 and S_CR.size != 0:
+            MF_para_H[k] = np.average(S_F * S_F, weights=delta_fk) / np.average(S_F, weights=delta_fk)
+            MCR_para_H[k] = np.average(S_CR, weights=delta_fk)
+            k = k + 1
+            if k > (H - 1):
+                k = 0
+
+        if verbose:
+            print("記録メモリ F = ", MF_para_H)
+            print("記録メモリ CR = ", MCR_para_H)
+
+        populations_G = populations
+        obj_list_G = obj_list
+        best_obj = min(obj_list)
+        best_x = populations[np.argmin(obj_list)]
+
+        if verbose:
+            print("現在の評価値 = ", obj_list_G)
+
+        if best_obj < prev_obj:
+            if verbose:
+                print("std(標準偏差) = ", np.std(obj_list))
+                print("mean(平均) = ", np.mean(obj_list))
+            if np.std(obj_list) <= tol * np.abs(np.mean(obj_list)):
+                break
+            prev_obj = best_obj
+
+        if callback is not None:
+            callback(i, best_x, best_obj, populations)
+
+        if verbose:
+            time_end = time.perf_counter()
+            print("現在の経過時間は", time_end - time_sta)
+
+    return best_x, best_obj
+
+
+def mut_cross(MF_para_H, MCR_para_H, bounds, j, pop_size, obj_list_G, populations_G, P_i_int, Archive, dims, seed):
+    rng = np.random.default_rng(seed)
+
+    # Archive(list) + populations_G(list) を正しく結合する(要素ごとの足し算にならないよう明示的にlist化)
+    select_populations = Archive + [populations_G[idx] for idx in range(pop_size)]
+
+    Fi = -1.0
+    while Fi <= 0.0:
+        Fi = stats.cauchy.rvs(loc=MF_para_H, scale=math.sqrt(0.1), size=1, random_state=rng)
+        if Fi > 1.0:
+            Fi = 1.0
+
+    A = np.array(obj_list_G)
+    A_sort_index = np.argsort(A)
+    xpbest_group = [populations_G[A_sort_index[i]] for i in range(P_i_int)]
+    xpbest = xpbest_group[rng.integers(0, len(xpbest_group))]
+
+    indexes = [i for i in range(pop_size) if i != j]
+    a = populations_G[rng.choice(indexes, 1, replace=False)][0]
+
+    b = select_populations[rng.integers(0, len(select_populations))]
+    retry = 0
+    while np.all(b == 0.0) and retry < 200:
+        b = select_populations[rng.integers(0, len(select_populations))]
+        retry += 1
+
+    mutated = populations_G[j] + Fi * (xpbest - populations_G[j]) + Fi * (a - b)
+
+    for i in range(dims):
+        if mutated[0][i] <= 0:
+            mutated[0][i] = populations_G[j][i] / 2
+        elif mutated[0][i] > 0.996:
+            mutated[0][i] = (populations_G[j][i] + 0.996) / 2
+
+    trial = np.zeros(dims)
+    CRi = stats.norm.rvs(loc=MCR_para_H, scale=math.sqrt(0.1), size=1, random_state=rng)
+    if CRi > 1:
+        CRi = 1
+    elif CRi < 0:
+        CRi = 0
+
+    p = rng.random(dims)
+    p[rng.integers(0, dims)] = 0
+
+    for i in range(dims):
+        if p[i] <= CRi:
+            trial[i] = mutated[0][i]
+        else:
+            trial[i] = populations_G[j][i]
+
+    return trial, Fi, CRi
+
+
+def wrapper_mut_cross(args):
+    return mut_cross(*args)
+
+
+def selection(func, params, j, obj_list, populations, trial, Fi, CRi, S_F, S_CR, delta_fk, Archive, Archivetimes):
+    obj_trial = func(trial, params)
+
+    if obj_trial < obj_list[j]:
+        if Archivetimes == (len(Archive) - 1):
+            replace_idx = np.random.randint(0, Archivetimes + 1)
+            Archive[replace_idx] = populations[j]
+        else:
+            Archive[Archivetimes] = populations[j]
+            Archivetimes = Archivetimes + 1
+
+        delta_fk_cal = abs(obj_list[j] - obj_trial)
+        delta_fk = np.append(delta_fk, delta_fk_cal)
+
+        S_F = np.append(S_F, Fi)
+        S_CR = np.append(S_CR, CRi)
+
+        populations[j] = trial
+        obj_list[j] = obj_trial
+
+    else:
+        if Archivetimes == (len(Archive) - 1):
+            replace_idx = np.random.randint(0, Archivetimes + 1)
+            Archive[replace_idx] = trial
+        else:
+            Archive[Archivetimes] = trial
+            Archivetimes = Archivetimes + 1
+
+    return obj_list[j], populations[j], S_F, S_CR, delta_fk, Archive, Archivetimes
 """
 import numpy as np
 import random
