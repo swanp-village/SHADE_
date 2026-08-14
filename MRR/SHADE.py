@@ -51,10 +51,10 @@ def SHADE(func, bounds, params, pop_size, max_iter, H,  tol, callback=None, rng=
         
         
         mut_cross_paras = [[MF_para_H[r[j]], MCR_para_H[r[j]], bounds, j, pop_size, obj_list_G, populations_G, P_i_int, Archive, xdim, np.random.randint(0, 2 ** 32 -1)] for j in range(pop_size)]
-        p = Pool(processes = pop_size)
-                  
-        tmp = list( p.map(wrapper_mut_cross, mut_cross_paras) ) #一時的な答え、この後スライスし、必要なところだけ切り取る
-        
+        #p = Pool(processes = pop_size)
+        #tmp = list( p.map(wrapper_mut_cross, mut_cross_paras) ) #一時的な答え、この後スライスし、必要なところだけ切り取る
+        with Pool(processes=pop_size) as p:
+            tmp = list(p.map(wrapper_mut_cross, mut_cross_paras))
         all_trial = np.zeros((pop_size, xdim))
         all_Fi = np.zeros(pop_size)
         all_CRi = np.zeros(pop_size)
