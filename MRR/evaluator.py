@@ -4,7 +4,7 @@ import numpy.typing as npt
 from scipy.signal import argrelmax, argrelmin
 
 
-
+"""
 def evaluate_band(
     x: npt.NDArray[np.float_],
     y: npt.NDArray[np.float_],
@@ -57,12 +57,12 @@ def evaluate_band(
     
     
     return E
-
-
-
-
-
 """
+
+
+
+
+
 #⓹　クロストークのペナルティを調整したやつ
 def evaluate_band(
     x: npt.NDArray[np.float_],
@@ -124,7 +124,7 @@ def evaluate_band(
     
     
     return E
-"""
+
 
 
 
@@ -413,7 +413,7 @@ def _evaluate_cross_talk(
 
 
 
-"""
+
 #⓹
 def _evaluate_cross_talk_with_dynamic_penalty(
     y: npt.NDArray[np.float_],
@@ -469,13 +469,13 @@ def _evaluate_cross_talk_with_dynamic_penalty(
             (1.0 - min_penalty_multiplier) * np.exp(-penalty_steepness * violation_db)
             
     return (np.float_(continuous_score), np.float_(penalty_multiplier))
+
+
+
+
+
+
 """
-
-
-
-
-
-
 #これが一番うまくいく。(過去いっただけ、二つ↑のやつが現状良い)
 
 def _evaluate_cross_talk(  y: npt.NDArray[np.float_], max_crosstalk: float, pass_band_start: int, pass_band_end: int
@@ -510,7 +510,7 @@ def _evaluate_cross_talk(  y: npt.NDArray[np.float_], max_crosstalk: float, pass
         return(E,False)
     else:
         return(1,True)
-
+"""
 
 
 
