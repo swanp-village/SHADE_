@@ -113,7 +113,7 @@ def SHADE(func, bounds, params, pop_size, max_iter, H,  tol, callback=None, rng=
 
 def mut_cross(MF_para_H, MCR_para_H, bounds, j, pop_size, obj_list_G, populations_G, P_i_int, Archive, dims, seed):
     rng = np.random.default_rng(seed)
-    select_populations = Archive + populations_G
+    select_populations = Archive + list(populations_G)
     Fi = -1.0
     while Fi <= 0.0:
         Fi = stats.cauchy.rvs(loc = MF_para_H, scale = math.sqrt(0.1), size = 1, random_state = rng)
