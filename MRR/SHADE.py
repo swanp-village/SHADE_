@@ -70,29 +70,34 @@ def wrapper_mut_cross(args):
 
 def selection(func, params, j, obj_list, populations, trial, Fi, CRi, S_F, S_CR, delta_fk, Archive, Archivetimes):
     obj_trial = func(trial, params)
-    
-    # 優れていた場合のみ更新＆古い親解をアーカイブへ保存
+
     if obj_trial < obj_list[j]:
-        # populations[j]が更新される前にアーカイブに保存する（参照渡しを防ぐためcopyを使用）
         if Archivetimes == (len(Archive) - 1):
-            Archive[random.randint(0, Archivetimes)] = populations[j].copy()
+            replace_idx = np.random.randint(0, Archivetimes + 1)
+            Archive[replace_idx] = populations[j]
         else:
-            Archive[Archivetimes] = populations[j].copy()
+            Archive[Archivetimes] = populations[j]
             Archivetimes = Archivetimes + 1
 
         delta_fk_cal = abs(obj_list[j] - obj_trial)
         delta_fk = np.append(delta_fk, delta_fk_cal)
-        
+
         S_F = np.append(S_F, Fi)
         S_CR = np.append(S_CR, CRi)
 
         populations[j] = trial
         obj_list[j] = obj_trial
 
-    # 悪かった解をアーカイブに入れる致命的バグ（elseブロック）を完全削除
+    else:
+        if Archivetimes == (len(Archive) - 1):
+            replace_idx = np.random.randint(0, Archivetimes + 1)
+            Archive[replace_idx] = trial
+        else:
+            Archive[Archivetimes] = trial
+            Archivetimes = Archivetimes + 1
 
     return obj_list[j], populations[j], S_F, S_CR, delta_fk, Archive, Archivetimes
-
+    
 def SHADE(func, bounds, params, pop_size, max_iter, H, tol, callback=None, rng=None):
     if rng is None:
         rng = np.random.default_rng()
