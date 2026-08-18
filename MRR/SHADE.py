@@ -183,8 +183,8 @@ def SHADE(func, bounds, params, pop_size, max_iter, H, tol, callback=None, rng=N
                 print("mean(平均) = ", np.mean(obj_list))
                 
                 # 収束判定
-                if np.std(obj_list) <= tol * np.abs(np.mean(obj_list)):
-                    break
+                #if np.std(obj_list) <= tol * np.abs(np.mean(obj_list)):
+                    #break
                 prev_obj = best_obj
             
             if callback is not None:
