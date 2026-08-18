@@ -1,4 +1,5 @@
-"""
+
+#長沼さんのそのまま
 import numpy as np
 import random
 import math
@@ -109,7 +110,8 @@ def SHADE(func, bounds, params, pop_size, max_iter, H,  tol, callback=None, rng=
 
 def mut_cross(MF_para_H, MCR_para_H, bounds, j, pop_size, obj_list_G, populations_G, P_i_int, Archive, dims, seed):
     rng = np.random.default_rng(seed)
-    select_populations = Archive + populations_G
+    select_populations = Archive + list(populations_G)
+    #select_populations = Archive + populations_G
     Fi = -1.0
     while Fi <= 0.0:
         Fi = stats.cauchy.rvs(loc = MF_para_H, scale = math.sqrt(0.1), size = 1, random_state = rng)
@@ -187,7 +189,9 @@ def selection(func, params, j, obj_list, populations, trial, Fi, CRi, S_F, S_CR,
 
 
     return obj_list[j], populations[j], S_F, S_CR, delta_fk, Archive, Archivetimes
+
 """
+#Claudeが作ったやつ
 import numpy as np
 import math
 import time
@@ -197,20 +201,7 @@ from pyDOE2 import lhs
 
 
 def SHADE(func, bounds, params, pop_size, max_iter, H, tol, callback=None, rng=None, verbose=False):
-    """
-    成功履歴自己適応型差分進化法 (SHADE)
-
-    修正点(先輩のコードからの変更点):
-      1. rngがそのまま探索全体に使われるようにし、再現性を確保
-         (mut_crossに渡す各ワーカー用シードも、このrngから生成する)
-      2. Archiveとpopulations_Gの結合を、要素ごとの足し算ではなく
-         正しいリスト結合(2*pop_size個の候補集合)に修正
-      3. multiprocessing.Poolをwith文で確実にclose/joinするよう修正
-         (世代ごとに作り直してもリソースが残らないようにする)
-      4. mut_cross内のrandom(標準ライブラリ)をrng(numpy Generator)に統一
-         これも再現性のため
-      5. デバッグ用printはverboseフラグで制御(デフォルトOFF)
-    """
+   
     if rng is None:
         rng = np.random.default_rng()
 
@@ -430,6 +421,8 @@ def selection(func, params, j, obj_list, populations, trial, Fi, CRi, S_F, S_CR,
 
     return obj_list[j], populations[j], S_F, S_CR, delta_fk, Archive, Archivetimes
 """
+"""
+#ちょっとこっちで修正したやつ
 import numpy as np
 import random
 import math
@@ -628,6 +621,7 @@ def selection(func, params, j, obj_list, populations, trial, Fi, CRi, S_F, S_CR,
     return obj_list[j], populations[j], S_F, S_CR, delta_fk, Archive, Archivetimes
 """
 """
+#いろんなデバックがあるやつ
 import numpy as np
 import random
 import math
