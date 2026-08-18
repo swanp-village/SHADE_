@@ -1,3 +1,4 @@
+"""
 import argparse
 import numpy as np
 
@@ -73,14 +74,14 @@ if __name__ == "__main__":
         skip_plot=skip_plot,
         fixed_N=fixed_N, # ★ここでDE.pyに渡す！
     )
+"""
 
 
 
 
 
 
-
-""" #変更前のmain関数
+ #変更前のmain関数
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--skip-plot", action="store_true")
@@ -110,4 +111,4 @@ if __name__ == "__main__":
         logger=logger,
         skip_plot=skip_plot,
     )
-"""
+
